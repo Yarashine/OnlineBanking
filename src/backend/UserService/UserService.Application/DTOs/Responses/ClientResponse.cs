@@ -1,0 +1,13 @@
+﻿using System;
+using System.Collections.Generic;
+namespace UserService.Application.DTOs.Responses;
+
+public class ClientResponse
+{
+    public string Id { get; set; }
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public string Patronymic { get; set; }
+    public string PhoneNumber { get; set; }
+    public string PassportIdentifier { get; set; }
+}

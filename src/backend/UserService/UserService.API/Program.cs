@@ -1,3 +1,7 @@
+using UserService.API.DI;
+using UserService.API.Middlewares;
+using UserService.Application.DI;
+using UserService.Infrastructure.DI;
 
 namespace UserService.API
 {
@@ -6,25 +10,40 @@ namespace UserService.API
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
-            // Add services to the container.
-
             builder.Services.AddControllers();
-            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
+
+            builder.Services.AddHttpContextAccessor()
+                .AddRedis(builder.Configuration)
+                .AddMongo(builder.Configuration)
+                .ConfigureJwt(builder.Configuration)
+                .AddCustomIdentity(builder.Configuration)
+                .AddSwagger()
+                .AddJwt(builder.Configuration)
+                .AddHealthChecks(builder.Configuration)
+                .AddUseCases()
+                .AddServices(builder.Configuration)
+                .AddValidation();
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
+            app.UseCustomSwagger();
+            app.UseMigrationForMSSQL();
+
             if (app.Environment.IsDevelopment())
             {
                 app.MapOpenApi();
             }
 
-            app.UseHttpsRedirection();
+            app.AddRoles();
 
+            app.UseHttpsRedirection();
+            app.UseRouting();
+            app.UseAuthentication();
             app.UseAuthorization();
 
+            app.UseMapHealth();
 
             app.MapControllers();
 

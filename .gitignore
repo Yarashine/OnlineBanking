@@ -3,6 +3,10 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+src/backend/UserService/data/
+src/backend/stylecop.ruleset
+src/backend/UserService/Directory.Build.props
+
 # User-specific files
 *.rsuser
 *.suo
@@ -361,4 +365,3 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-/src/backend/UserService/Directory.Build.props
