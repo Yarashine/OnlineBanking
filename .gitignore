@@ -4,6 +4,7 @@
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
 src/backend/UserService/data/
+src/backend/NotificationService/data/
 src/backend/stylecop.ruleset
 src/backend/UserService/Directory.Build.props
 src/backend/NotificationService/Directory.Build.props
