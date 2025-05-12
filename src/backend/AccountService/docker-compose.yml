@@ -1,0 +1,18 @@
+services:
+  accountservice.api:
+    image: ${DOCKER_REGISTRY-}accountserviceapi
+    build:
+      context: .
+      dockerfile: AccountService.API/Dockerfile
+
+  mssql:
+   image: mcr.microsoft.com/mssql/server:2022-latest
+   user: root
+   ports:
+    - "1433:1433"
+   volumes:
+    - ./data/mssql:/var/opt/mssql/data
+   environment:
+    - ACCEPT_EULA=Y
+    - SA_PASSWORD=MyStrong@Passw0rd
+    - MSSQL_PID=Developer
