@@ -18,6 +18,13 @@ namespace AccountService.API
         {
             var builder = WebApplication.CreateBuilder(args);
 
+
+            builder.Services.AddEndpointsApiExplorer();
+
+            builder.Services.AddControllers();
+            builder.Services.AddOpenApi();
+
+
             builder.Services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo
@@ -27,9 +34,6 @@ namespace AccountService.API
                 });
             });
 
-            // Add services to the container.
-
-            builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddDbContext<AccountDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("MSSQL")));
@@ -41,14 +45,14 @@ namespace AccountService.API
 
 
             var app = builder.Build();
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Account API v1");
+            });
 
             if (app.Environment.IsDevelopment())
             {
-                app.UseSwagger();
-                app.UseSwaggerUI(c =>
-                {
-                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Account API v1");
-                });
             }
 
             using (var scope = app.Services.CreateScope())
