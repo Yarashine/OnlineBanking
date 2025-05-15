@@ -9,7 +9,13 @@ namespace UserService.API.Controllers;
 
 [ApiController]
 [Route("api/client")]
-public class ClientController(ICreateUseCase createClient, IUpdateUseCase updateClient, IDeleteUseCase deleteClient, IGetAllUseCase getAllClients, IGetByIdUseCase getClientById, IGetByUserIdUseCase getClientByUserId) : Controller
+public class ClientController(
+    ICreateUseCase createClient,
+    IUpdateUseCase updateClient,
+    IDeleteUseCase deleteClient,
+    IGetAllUseCase getAllClients,
+    IGetByIdUseCase getClientById,
+    IGetByUserIdUseCase getClientByUserId) : ControllerBase
 {
     [Authorize]
     [HttpPost]

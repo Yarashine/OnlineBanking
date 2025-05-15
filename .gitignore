@@ -3,9 +3,13 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
-src/backend/UserService/data/
 src/backend/stylecop.ruleset
+src/backend/UserService/data/
 src/backend/UserService/Directory.Build.props
+src/backend/NotificationService/data/
+src/backend/NotificationService/Directory.Build.props
+src/backend/AccountService/data/
+src/backend/AccountService/Directory.Build.props
 
 # User-specific files
 *.rsuser

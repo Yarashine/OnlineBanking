@@ -11,7 +11,12 @@ namespace UserService.API.Controllers;
 
 [ApiController]
 [Route("api/auth")]
-public class AuthController(ILogOutAllUseCase logOutAllUseCase, ILogOutUseCase logOutUseCase, IRefreshAccessTokenUseCase refreshAccessTokenUseCase, ISignInUseCase signInUseCase, ISignUpUseCase signUpUseCase) : Controller
+public class AuthController(
+    ILogOutAllUseCase logOutAllUseCase,
+    ILogOutUseCase logOutUseCase,
+    IRefreshAccessTokenUseCase refreshAccessTokenUseCase,
+    ISignInUseCase signInUseCase,
+    ISignUpUseCase signUpUseCase) : ControllerBase
 {
     [HttpPost("signup")]
     public async Task<ActionResult<TokensResponse>> SignUp(SignUpRequest request, CancellationToken cancellation = default)

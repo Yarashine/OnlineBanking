@@ -16,7 +16,7 @@ public class TokenService(IOptions<JwtOptions> jwtOptions, IRefreshTokenReposito
 
     public async Task<(string RefreshToken, string AccessToken)> GenerateTokensAsync(string userId, string deviceId, string role, CancellationToken cancellation = default)
     {
-        var access = GenerateAceessToken(userId, role, cancellation);
+        var access = GenerateAccessToken(userId, role, cancellation);
         var refresh = await GenerateRefreshTokenAsync(userId, deviceId, cancellation);
         return (refresh, access);
     }
@@ -44,7 +44,7 @@ public class TokenService(IOptions<JwtOptions> jwtOptions, IRefreshTokenReposito
         return tokens;
     }
 
-    private string GenerateAceessToken(string userId, string role, CancellationToken cancellation = default)
+    private string GenerateAccessToken(string userId, string role, CancellationToken cancellation = default)
     {
         cancellation.ThrowIfCancellationRequested();
 
