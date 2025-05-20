@@ -4,7 +4,7 @@ using NotificationService.API.DI;
 
 public class Program
 {
-    public static void Main(string[] args)
+    public async static Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
 
@@ -15,7 +15,9 @@ public class Program
 
         builder.Services.AddConfigs(builder.Configuration);
 
-        builder.Services.AddConnetionStrings(builder.Configuration);
+        builder.Services.AddConnectionStrings(builder.Configuration);
+
+        builder.Services.AddValidation();
 
         builder.Services.AddServices();
 
@@ -36,7 +38,7 @@ public class Program
 
         app.MapControllers();
 
-        app.UseMigration();
+        await app.UseMigration();
 
         app.Run();
     }

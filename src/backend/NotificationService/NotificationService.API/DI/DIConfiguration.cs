@@ -14,6 +14,10 @@ using NotificationService.Infrastructure.Repositories;
 using NotificationService.Infrastructure.Services;
 using StackExchange.Redis;
 using NotificationService.Application.DI;
+using System.Threading.Tasks;
+using FluentValidation.AspNetCore;
+using FluentValidation;
+using System.Reflection;
 
 public static class DIConfiguration
 {
@@ -24,7 +28,7 @@ public static class DIConfiguration
         return services;
     }
 
-    public static IServiceCollection AddConnetionStrings(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddConnectionStrings(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString("MSSQL")));
@@ -45,6 +49,14 @@ public static class DIConfiguration
         services.AddScoped<IGetAllUseCase, GetAllUseCase>();
         services.AddScoped<IGetUnreadUseCase, GetUnreadUseCase>();
         services.AddMapping();
+        return services;
+    }
+
+    public static IServiceCollection AddValidation(this IServiceCollection services)
+    {
+        services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+        services.AddFluentValidationAutoValidation();
+
         return services;
     }
 
@@ -71,12 +83,15 @@ public static class DIConfiguration
         return app;
     }
 
-    public static IApplicationBuilder UseMigration(this IApplicationBuilder app)
+    public static async Task<IApplicationBuilder> UseMigration(this IApplicationBuilder app, CancellationToken cancellation = default)
     {
         using (var scope = app.ApplicationServices.CreateScope())
         {
             var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-            dbContext.Database.Migrate();
+            if (dbContext.Database.GetPendingMigrations().Any())
+            {
+                await dbContext.Database.MigrateAsync(cancellation);
+            }
         }
         return app;
     }
