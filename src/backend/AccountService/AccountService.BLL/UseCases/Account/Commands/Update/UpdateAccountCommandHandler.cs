@@ -13,6 +13,6 @@ public class UpdateAccountCommandHandler(
     {
         var accountForCheck = await accountRepository.GetByIdAsync(request.Id, cancellationToken) ?? throw new NotFoundException("Account");
         var account = autoMapper.Map<DAL.Entities.Account>(request);
-        await accountRepository.CreateAsync(account,cancellationToken);
+        await accountRepository.UpdateAsync(account,cancellationToken);
     }
 }

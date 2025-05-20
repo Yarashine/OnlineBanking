@@ -1,20 +1,10 @@
-
-using AccountService.BLL.UseCases.Account.Queries.GetAllByUserId;
-using AccountService.DAL.Contracts.Repositories;
-using AccountService.DAL.Data;
-using AccountService.DAL.Repositories;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using AccountService.BLL.MappingProfilies;
-using Microsoft.OpenApi.Models;
-using System;
-using System.Reflection;
+using AccountService.API.DI;
 
 namespace AccountService.API
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public async static Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -24,43 +14,22 @@ namespace AccountService.API
             builder.Services.AddControllers();
             builder.Services.AddOpenApi();
 
+            builder.Services.AddConnetionStrings(builder.Configuration);
 
-            builder.Services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo
-                {
-                    Title = "Account API",
-                    Version = "v1"
-                });
-            });
+            builder.Services.AddConfigs(builder.Configuration);
 
-            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-            builder.Services.AddDbContext<AccountDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("MSSQL")));
-            builder.Services.AddAutoMapper(typeof(AccountProfile).Assembly);
+            builder.Services.AddSwagger();
 
-            builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetAllAccountsByUserIdQuery).Assembly));
-
-            builder.Services.AddScoped<IAccountRepository, AccountRepository>();
-
+            builder.Services.AddServices();
 
             var app = builder.Build();
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Account API v1");
-            });
 
             if (app.Environment.IsDevelopment())
             {
+                app.UseSwaggerConfig();
             }
 
-            using (var scope = app.Services.CreateScope())
-            {
-                var dbContext = scope.ServiceProvider.GetRequiredService<AccountDbContext>();
-                dbContext.Database.Migrate();
-            }
-
+            await app.UseMigration();
 
             app.UseHttpsRedirection();
 
