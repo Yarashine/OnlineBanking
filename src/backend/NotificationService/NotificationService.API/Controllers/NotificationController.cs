@@ -6,7 +6,7 @@ using NotificationService.Application.DTOs.Requests;
 using NotificationService.Application.DTOs.Responses;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/notification")]
 public class NotificationController(
         ICreateUseCase createNotificationUseCase,
         IGetAllUseCase getAllNotificationsUseCase,
