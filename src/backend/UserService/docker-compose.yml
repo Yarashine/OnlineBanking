@@ -1,0 +1,49 @@
+services:
+  userservice.api:
+    image: ${DOCKER_REGISTRY-}userserviceapi
+    container_name: userservice
+    secrets:
+      - jwt_private_key
+    build:
+      context: .
+      dockerfile: UserService.API/Dockerfile
+    ports:
+    - "8080:8080"
+    - "8081:8081"
+
+  redis:
+   image: redis:alpine
+   ports:
+    - "6379:6379"
+   volumes:
+    - ./data/redis:/data
+
+  mssql:
+   image: mcr.microsoft.com/mssql/server:2022-latest
+   user: root
+   ports:
+    - "1433:1433"
+   secrets:
+    - jwt_private_key
+   volumes:
+    - ./data/mssql:/var/opt/mssql/data
+   environment:
+    - ACCEPT_EULA=Y
+    - SA_PASSWORD=MyStrong@Passw0rd
+    - MSSQL_PID=Developer
+
+  mongo:
+   image: mongo:latest
+   ports:
+    - "27017:27017"
+   volumes:
+    - ./data/mongo:/data/db
+
+secrets:
+   jwt_private_key:
+    file: ./UserService.API/secrets/jwt_private_key.txt
+
+
+
+
+    
