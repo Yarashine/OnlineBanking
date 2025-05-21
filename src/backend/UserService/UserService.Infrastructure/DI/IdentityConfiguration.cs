@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 using UserService.Domain.Entities;
 using UserService.Infrastructure.Data;
 
@@ -28,36 +29,15 @@ public static class IdentityConfiguration
         return services;
     }
 
-    public static IApplicationBuilder UseMigrationForMSSQL(this IApplicationBuilder app)
+    public static async Task<IApplicationBuilder> UseMigrationForMSSQL(this IApplicationBuilder app, CancellationToken cancellationToken = default)
     {
         using (var scope = app.ApplicationServices.CreateScope())
         {
             var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-            try
+            var pendingMigrations = dbContext.Database.GetPendingMigrations();
+            if (pendingMigrations.Any())
             {
-                if (dbContext.Database.CanConnect())
-                {
-                    var pendingMigrations = dbContext.Database.GetPendingMigrations();
-                    if (pendingMigrations.Any())
-                    {
-                        dbContext.Database.Migrate();
-                        Console.WriteLine("Pending migrations applied successfully.");
-                    }
-                    else
-                    {
-                        Console.WriteLine("No pending migrations to apply.");
-                    }
-                }
-                else
-                {
-                    dbContext.Database.Migrate();
-                    Console.WriteLine("Database created and migrations applied successfully.");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error applying migrations: {ex.Message}");
-                throw;
+                await dbContext.Database.MigrateAsync(cancellationToken);
             }
         }
 

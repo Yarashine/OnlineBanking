@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using UserService.Application.DTOs.Requests;
+using UserService.Domain.Validators;
 
 namespace UserService.API.Validators;
 
@@ -7,26 +8,28 @@ public class SignUpRequestValidator : AbstractValidator<SignUpRequest>
 {
     public SignUpRequestValidator()
     {
+        RuleFor(x => x.Username)
+            .Length(AuthValidator.MIN_USERNAME_LENGTH, AuthValidator.MAX_USERNAME_LENGTH)
+            .WithMessage($"Username must be between {AuthValidator.MIN_USERNAME_LENGTH} and {AuthValidator.MAX_USERNAME_LENGTH} characters.")
+            .Must(AuthValidator.UsernameValidatorRule)
+            .WithMessage("Username can only contain letters, numbers, underscores, or hyphens.");
+
+        RuleFor(x => x.DeviceId)
+            .Length(AuthValidator.MIN_DEVICE_ID_LENGTH, AuthValidator.MAX_DEVICE_ID_LENGTH)
+            .WithMessage($"Device ID must be between {AuthValidator.MIN_DEVICE_ID_LENGTH} and {AuthValidator.MAX_DEVICE_ID_LENGTH} characters.")
+            .Must(AuthValidator.DeviceIdValidatorRule)
+            .WithMessage("Device ID must contain only letters, numbers, or hyphens.");
+
+        RuleFor(x => x.Password)
+            .MinimumLength(AuthValidator.MIN_PASSWORD_LENGTH)
+            .WithMessage($"Password must be at least {AuthValidator.MIN_PASSWORD_LENGTH} characters long.")
+            .Must(AuthValidator.PasswordValidatorRule)
+            .WithMessage("Password must contain at least one uppercase letter, one lowercase letter, and one digit.");
+
         RuleFor(x => x.Email)
             .NotEmpty().WithMessage("Email is required.")
             .EmailAddress().WithMessage("Invalid email format.")
-            .MaximumLength(100).WithMessage("Email must not exceed 100 characters.");
-
-        RuleFor(x => x.Username)
-            .NotEmpty().WithMessage("Username is required.")
-            .Length(3, 50).WithMessage("Username must be between 3 and 50 characters.")
-            .Matches(@"^[a-zA-Z0-9_-]+$").WithMessage("Username can only contain letters, numbers, underscores, or hyphens.");
-
-        RuleFor(x => x.Password)
-            .NotEmpty().WithMessage("Password is required.")
-            .MinimumLength(8).WithMessage("Password must be at least 8 characters long.")
-            .Matches(@"[A-Z]").WithMessage("Password must contain at least one uppercase letter.")
-            .Matches(@"[a-z]").WithMessage("Password must contain at least one lowercase letter.")
-            .Matches(@"[0-9]").WithMessage("Password must contain at least one digit.");
-
-        RuleFor(x => x.DeviceId)
-            .NotEmpty().WithMessage("Device ID is required.")
-            .Matches(@"^[a-zA-Z0-9-]+$").WithMessage("Device ID must contain only letters, numbers, or hyphens.")
-            .Length(1, 100).WithMessage("Device ID must be between 1 and 100 characters.");
+            .MaximumLength(AuthValidator.MAX_EMAIL_LENGTH)
+            .WithMessage($"Email must not exceed {AuthValidator.MAX_EMAIL_LENGTH} characters.");
     }
 }

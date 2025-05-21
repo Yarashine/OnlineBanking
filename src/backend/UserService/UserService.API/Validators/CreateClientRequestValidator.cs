@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using UserService.Application.DTOs.Requests;
+using UserService.Domain.Validators;
 
 namespace UserService.API.Validators;
 
@@ -8,22 +9,30 @@ public class CreateClientRequestValidator : AbstractValidator<CreateClientReques
     public CreateClientRequestValidator()
     {
         RuleFor(x => x.FirstName)
-            .Length(2, 50).WithMessage("First name must be between 2 and 50 characters.")
-            .Matches(@"^[a-zA-Z\s-]+$").WithMessage("First name can only contain letters, spaces, or hyphens.");
+            .Length(ClientValidator.MIN_PATRONYMIC_LENGHT, ClientValidator.MAX_PATRONYMIC_LENGHT)
+            .WithMessage($"First name must be between {ClientValidator.MIN_PATRONYMIC_LENGHT} and {ClientValidator.MAX_PATRONYMIC_LENGHT} characters.")
+            .Must(ClientValidator.FirstNameValidatiorRule).WithMessage("First name can only contain letters, spaces, or hyphens.");
 
         RuleFor(x => x.LastName)
-            .Length(2, 50).WithMessage("Last name must be between 2 and 50 characters.")
-            .Matches(@"^[a-zA-Z\s-]+$").WithMessage("Last name can only contain letters, spaces, or hyphens.");
+            .Length(ClientValidator.MIN_LAST_NAME_LENGHT, ClientValidator.MAX_LAST_NAME_LENGHT)
+            .WithMessage($"Last name must be between {ClientValidator.MIN_LAST_NAME_LENGHT} and {ClientValidator.MAX_LAST_NAME_LENGHT} characters.")
+            .Must(ClientValidator.FirstNameValidatiorRule)
+            .WithMessage("Last name can only contain letters, spaces, or hyphens.");
 
         RuleFor(x => x.Patronymic)
-            .Length(2, 50).WithMessage("Patronymic must be between 2 and 50 characters.")
-            .Matches(@"^[a-zA-Z\s-]*$").WithMessage("Patronymic can only contain letters, spaces, or hyphens.");
+            .Length(ClientValidator.MIN_PATRONYMIC_LENGHT, ClientValidator.MAX_PATRONYMIC_LENGHT)
+            .WithMessage($"Patronymic must be between {ClientValidator.MIN_PATRONYMIC_LENGHT} and {ClientValidator.MAX_PATRONYMIC_LENGHT} characters.")
+            .Must(ClientValidator.FirstNameValidatiorRule)
+            .WithMessage("Patronymic can only contain letters, spaces, or hyphens.");
 
         RuleFor(x => x.PhoneNumber)
-            .Matches(@"^\+\d{10,15}$").WithMessage("Phone number must be in international format (e.g., +1234567890).");
+            .Must(ClientValidator.FirstNameValidatiorRule)
+            .WithMessage("Phone number must be in international format (e.g., +1234567890).");
 
         RuleFor(x => x.PassportIdentifier)
-            .Length(10).WithMessage("Passport identifier must be exactly 10 characters.")
-            .Matches(@"^[A-Za-z0-9]+$").WithMessage("Passport identifier can only contain letters and numbers.");
+            .Length(ClientValidator.PASSPORT_IDENTIFIER_LENGHT)
+            .WithMessage($"Passport identifier must be exactly {ClientValidator.PASSPORT_IDENTIFIER_LENGHT} characters.")
+            .Must(ClientValidator.FirstNameValidatiorRule)
+            .WithMessage("Passport identifier can only contain letters and numbers.");
     }
 }

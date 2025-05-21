@@ -7,7 +7,7 @@ namespace UserService.API
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddControllers();
@@ -29,7 +29,8 @@ namespace UserService.API
 
             app.UseMiddleware<ExceptionHandlingMiddleware>();
             app.UseCustomSwagger();
-            app.UseMigrationForMSSQL();
+
+            await app.UseMigrationForMSSQL();
 
             if (app.Environment.IsDevelopment())
             {
