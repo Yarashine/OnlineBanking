@@ -1,25 +1,35 @@
+using AccountService.API.DI;
 
 namespace AccountService.API
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public async static Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+
+            builder.Services.AddEndpointsApiExplorer();
 
             builder.Services.AddControllers();
-            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
+
+            builder.Services.AddConnetionStrings(builder.Configuration);
+
+            builder.Services.AddConfigs(builder.Configuration);
+
+            builder.Services.AddSwagger();
+
+            builder.Services.AddServices();
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
-                app.MapOpenApi();
+                app.UseSwaggerConfig();
             }
+
+            await app.UseMigration();
 
             app.UseHttpsRedirection();
 
