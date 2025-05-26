@@ -9,8 +9,7 @@ using Microsoft.Extensions.Options;
 namespace AccountService.BLL.UseCases.Account.Queries.GetAllTransfersById;
 
 public class GetAllTransfersByIdQueryHandler(
-    IAccountRepository accountRepository,
-    ITransferRepository transferRepository,
+    IUnitOfWork unitOfWork,
     IOptions<PaginationSettings> paginationOptions,
     IMapper autoMapper) : IRequestHandler<GetAllTransfersByIdQuery, IEnumerable<TransferResponse>>
 {
@@ -32,10 +31,10 @@ public class GetAllTransfersByIdQueryHandler(
             pageNumber = 1;
         }
 
-        var accountForCheck = await accountRepository.GetByIdAsync(request.Id, cancellationToken) 
+        var accountForCheck = await unitOfWork.AccountRepository.GetByIdAsync(request.Id, cancellationToken) 
             ?? throw new NotFoundException("Account");
 
-        var transfers = await transferRepository.GetAllByIdAsync(request.Id, pageNumber, pageSize, cancellationToken);
+        var transfers = await unitOfWork.TransferRepository.GetAllByIdAsync(request.Id, pageNumber, pageSize, cancellationToken);
 
         return autoMapper.Map<IEnumerable<TransferResponse>>(transfers);
     }

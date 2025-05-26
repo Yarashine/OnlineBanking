@@ -5,12 +5,13 @@ using MediatR;
 namespace AccountService.BLL.UseCases.Account.Commands.Create;
 
 public class CreateAccountCommandHandler(
-    IAccountRepository accountRepository, 
+    IUnitOfWork unitOfWork,
     IMapper autoMapper) : IRequestHandler<CreateAccountCommand>
 {
     public async Task Handle(CreateAccountCommand request, CancellationToken cancellationToken = default)
     {
         var account = autoMapper.Map<DAL.Entities.Account>(request);
-        await accountRepository.CreateAsync(account, cancellationToken);
+        await unitOfWork.AccountRepository.CreateAsync(account, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
     }
 }

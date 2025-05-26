@@ -18,6 +18,7 @@ public class AccountController(IMediator mediator) : ControllerBase
     {
         var command = new CreateAccountCommand { UserId = userId };
         await mediator.Send(command, cancellationToken);
+
         return Ok();
     }
 
@@ -26,6 +27,7 @@ public class AccountController(IMediator mediator) : ControllerBase
     {
         var query = new GetAccountByIdQuery(accountId);
         var account = await mediator.Send(query, cancellationToken);
+
         return Ok(account);
     }
 
@@ -34,6 +36,7 @@ public class AccountController(IMediator mediator) : ControllerBase
     {
         var query = new GetAllAccountsByUserIdQuery(userId);
         var accounts = await mediator.Send(query, cancellationToken);
+
         return Ok(accounts);
     }
 
@@ -41,6 +44,7 @@ public class AccountController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> UpdateAccount(UpdateAccountCommand command, CancellationToken cancellationToken = default)
     {
         await mediator.Send(command, cancellationToken);
+
         return Ok();
     }
 
@@ -49,6 +53,7 @@ public class AccountController(IMediator mediator) : ControllerBase
     {
         var command = new DeleteAccountCommand { Id = accountId };
         await mediator.Send(command, cancellationToken);
+
         return Ok();
     }
 }

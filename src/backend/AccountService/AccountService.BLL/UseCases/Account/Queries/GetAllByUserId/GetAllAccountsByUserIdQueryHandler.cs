@@ -8,7 +8,7 @@ using Microsoft.Extensions.Options;
 namespace AccountService.BLL.UseCases.Account.Queries.GetAllByUserId;
 
 public class GetAllAccountsByUserIdQueryHandler(
-    IAccountRepository accountRepository,
+    IUnitOfWork unitOfWork,
     IOptions<PaginationSettings> paginationOptions,
     IMapper autoMapper) : IRequestHandler<GetAllAccountsByUserIdQuery, IEnumerable<AccountResponse>>
 {
@@ -30,7 +30,8 @@ public class GetAllAccountsByUserIdQueryHandler(
             pageNumber = 1;
         }
 
-        var accounts = await accountRepository.GetAllByUserIdAsync(request.UserId, pageNumber, pageSize, cancellationToken);
+        var accounts = await unitOfWork.AccountRepository.GetAllByUserIdAsync(request.UserId, pageNumber, pageSize, cancellationToken);
+
         return autoMapper.Map<IEnumerable<AccountResponse>>(accounts);
     }
 }

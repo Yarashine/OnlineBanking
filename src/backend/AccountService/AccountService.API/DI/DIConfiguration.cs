@@ -14,6 +14,7 @@ public static class DIConfiguration
     public static IServiceCollection AddConfigs(this IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<PaginationSettings>(configuration.GetSection(PaginationSettings.SectionName));
+
         return services;
     }
 
@@ -27,6 +28,7 @@ public static class DIConfiguration
                 Version = "v1"
             });
         });
+
         return services;
     }
 
@@ -37,6 +39,7 @@ public static class DIConfiguration
         {
             c.SwaggerEndpoint("/swagger/v1/swagger.json", "Account API v1");
         });
+
         return app;
     }
     public async static Task<IApplicationBuilder> UseMigration(this IApplicationBuilder app, CancellationToken cancellationToken = default)
@@ -50,6 +53,7 @@ public static class DIConfiguration
                 await dbContext.Database.MigrateAsync(cancellationToken);
             }
         }
+
         return app;
     }
 
@@ -59,14 +63,18 @@ public static class DIConfiguration
 
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetAllAccountsByUserIdQuery).Assembly));
 
+        services.AddScoped<IDbContext, AccountDbContext>();
         services.AddScoped<IAccountRepository, AccountRepository>();
         services.AddScoped<ITransferRepository, TransferRepository>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+
         return services;
     }
     public static IServiceCollection AddConnetionStrings(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddDbContext<AccountDbContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString("MSSQL")));
+
         return services;
     }
 }

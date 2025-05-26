@@ -15,6 +15,7 @@ public class TransferController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> Transfer(TransferAccountCommand command, CancellationToken cancellationToken = default)
     {
         await mediator.Send(command, cancellationToken);
+
         return Ok();
     }
 
@@ -23,6 +24,7 @@ public class TransferController(IMediator mediator) : ControllerBase
     {
         var query = new GetAllTransfersByIdQuery(accountId);
         var accounts = await mediator.Send(query, cancellationToken);
+
         return Ok(accounts);
     }
 }

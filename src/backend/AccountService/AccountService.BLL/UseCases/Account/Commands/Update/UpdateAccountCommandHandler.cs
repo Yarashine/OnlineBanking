@@ -6,13 +6,14 @@ using MediatR;
 namespace AccountService.BLL.UseCases.Account.Commands.Update;
 
 public class UpdateAccountCommandHandler(
-    IAccountRepository accountRepository,
+    IUnitOfWork unitOfWork,
     IMapper autoMapper) : IRequestHandler<UpdateAccountCommand>
 {
     public async Task Handle(UpdateAccountCommand request, CancellationToken cancellationToken = default)
     {
-        var accountForCheck = await accountRepository.GetByIdAsync(request.Id, cancellationToken) ?? throw new NotFoundException("Account");
+        var accountForCheck = await unitOfWork.AccountRepository.GetByIdAsync(request.Id, cancellationToken) ?? throw new NotFoundException("Account");
         var account = autoMapper.Map<DAL.Entities.Account>(request);
-        await accountRepository.UpdateAsync(account,cancellationToken);
+        unitOfWork.AccountRepository.Update(account, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
     }
 }

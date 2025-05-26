@@ -4,5 +4,7 @@ namespace AccountService.DAL.Contracts.Repositories;
 
 public interface IRepository<T> where T : class
 {
-    public IQueryable<T> ApplyPagination(IQueryable<T> query, int pageNumber, int pageSize);
+    Task CreateAsync(T account, CancellationToken cancellationToken);
+    Task<T> GetByIdAsync(Guid accountId, CancellationToken cancellationToken);
+    void Update(Account account, CancellationToken cancellationToken);
 }

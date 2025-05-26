@@ -4,12 +4,27 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AccountService.DAL.Repositories;
 
-public class BaseRepository<T> : IRepository<T> where T : class
+public class BaseRepository<T>(IDbContext dbContext) : IRepository<T> where T : Entity
 {
-    public IQueryable<T> ApplyPagination(IQueryable<T> query, int pageNumber, int pageSize)
+    private readonly DbSet<T> dbSet = dbContext.Set<T>();
+
+    public async Task CreateAsync(T account, CancellationToken cancellationToken)
     {
-        return query
-            .Skip((pageNumber - 1) * pageSize)
-            .Take(pageSize);
+        await dbSet.AddAsync(account, cancellationToken);
+    }
+
+    public void Update(Account account, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        account.UpdatedAt = DateTime.UtcNow;
+        dbContext.Entry(account).State = EntityState.Modified;
+    }
+
+    public async Task<T> GetByIdAsync(Guid accountId, CancellationToken cancellationToken)
+    {
+        return await dbSet
+            .AsNoTracking()
+            .FirstOrDefaultAsync(a => a.Id == accountId, cancellationToken);
     }
 }
