@@ -3,6 +3,7 @@
 using NotificationService.Application.Contracts.Services;
 using NotificationService.Domain.Exceptions;
 using StackExchange.Redis;
+using System.Text.Json;
 
 public class TokenService(IConnectionMultiplexer redis) : ITokenService
 {
@@ -19,7 +20,7 @@ public class TokenService(IConnectionMultiplexer redis) : ITokenService
         return confirmToken;
     }
 
-    public async Task VerifyConfirmationTokenAsync(string userId, string token, CancellationToken cancellation)
+    public async Task VerifyConfirmationTokenAsync(string token, CancellationToken cancellation)
     {
         cancellation.ThrowIfCancellationRequested();
 
@@ -30,18 +31,25 @@ public class TokenService(IConnectionMultiplexer redis) : ITokenService
         }
     }
 
-    public async Task<string> GenerateResetTokenAsync(string userId, CancellationToken cancellation)
+    public async Task<string> GenerateResetTokenAsync(string userId, string newPassword, CancellationToken cancellation)
     {
         cancellation.ThrowIfCancellationRequested();
 
         var resetToken = Guid.NewGuid().ToString();
 
-        await db.StringSetAsync($"reset:{resetToken}", userId, TimeSpan.FromMinutes(10));
+        var tokenData = new
+        {
+            UserId = userId,
+            NewPassword = newPassword,
+        };
+        var serializedData = JsonSerializer.Serialize(tokenData);
+
+        await db.StringSetAsync($"reset:{resetToken}", serializedData, TimeSpan.FromMinutes(10));
 
         return resetToken;
     }
 
-    public async Task VerifyResetTokenAsync(string userId, string token, CancellationToken cancellation)
+    public async Task VerifyResetTokenAsync(string token, CancellationToken cancellation)
     {
         cancellation.ThrowIfCancellationRequested();
 
@@ -50,5 +58,17 @@ public class TokenService(IConnectionMultiplexer redis) : ITokenService
         {
             throw new BadRequestException("Bad token exception");
         }
+
+        var tokenData = JsonSerializer.Deserialize<TokenData>(value);
+        if (tokenData == null || string.IsNullOrEmpty(tokenData.UserId) || string.IsNullOrEmpty(tokenData.HashedPassword))
+        {
+            throw new BadRequestException("Corrupted token data");
+        }
+    }
+
+    private class TokenData
+    {
+        public string UserId { get; set; }
+        public string HashedPassword { get; set; }
     }
 }

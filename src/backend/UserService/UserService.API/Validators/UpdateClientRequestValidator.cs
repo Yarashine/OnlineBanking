@@ -48,8 +48,5 @@ public class UpdateClientRequestValidator : AbstractValidator<UpdateClientReques
             .Must(ClientValidator.PassportValidatiorRule)
             .When(x => x.PassportIdentifier != null)
             .WithMessage("Passport identifier can only contain letters and numbers.");
-
-        RuleFor(x => x.UserId)
-            .GreaterThan(0).WithMessage("User ID must be a positive number.");
     }
 }

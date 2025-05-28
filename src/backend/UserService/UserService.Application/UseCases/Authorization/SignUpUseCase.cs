@@ -20,14 +20,6 @@ public class SignUpUseCase(IMapper autoMapper, UserManager<User> userManager, IT
     {
         var user = autoMapper.Map<User>(request);
         var result = await userManager.CreateAsync(user, request.Password);
-        try
-        {
-            throw new Exception("error");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex);
-        }
         if (result.Errors.Any())
         {
             var error = result.Errors.First();

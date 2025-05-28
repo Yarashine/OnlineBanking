@@ -16,6 +16,12 @@ public class SignInUseCase(UserManager<User> userManager, ITokenService tokenSer
     public async Task<TokensResponse> ExecuteAsync(SignInRequest request, CancellationToken cancellationToken)
     {
         var user = await userManager.FindByNameAsync(request.Login) ?? throw new BadRequestException("Invalid credentials");
+        var isConfirmedEmail = await userManager.IsEmailConfirmedAsync(user);
+        if (!isConfirmedEmail)
+        {
+            throw new BadRequestException("Email should be confirmed");
+        }
+
         var isPasswordCorrect = await userManager.CheckPasswordAsync(user, request.Password);
         if (!isPasswordCorrect)
         {

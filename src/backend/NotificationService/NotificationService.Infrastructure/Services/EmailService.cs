@@ -39,8 +39,8 @@ public class EmailService(IOptions<SmtpSettings> smtpSettingsOption) : IEmailSer
 
         try
         {
-            await client.ConnectAsync(this.smtpSettings.SmtpServer, this.smtpSettings.Port, this.smtpSettings.UseSSL);
-            await client.AuthenticateAsync(this.smtpSettings.Username, this.smtpSettings.Password);
+            await client.ConnectAsync(this.smtpSettings.SmtpServer, this.smtpSettings.Port, this.smtpSettings.UseSSL, cancellation);
+            await client.AuthenticateAsync(this.smtpSettings.Username, this.smtpSettings.Password, cancellation);
             var res1 = await client.SendAsync(emailMessage, cancellation);
         }
         finally

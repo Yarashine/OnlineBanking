@@ -7,38 +7,18 @@ services:
     build:
       context: .
       dockerfile: UserService.API/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ASPNETCORE_HTTPS_PORTS=8081
     ports:
-    - "8080:8080"
-    - "8081:8081"
-
-  redis:
-   image: redis:alpine
-   ports:
-    - "6379:6379"
-   volumes:
-    - ./data/redis:/data
-
-  mssql:
-   image: mcr.microsoft.com/mssql/server:2022-latest
-   user: root
-   ports:
-    - "1433:1433"
-   secrets:
-    - jwt_private_key
-   volumes:
-    - ./data/mssql:/var/opt/mssql/data
-   environment:
-    - ACCEPT_EULA=Y
-    - SA_PASSWORD=MyStrong@Passw0rd
-    - MSSQL_PID=Developer
-
-  mongo:
-   image: mongo:latest
-   ports:
-    - "27017:27017"
-   volumes:
-    - ./data/mongo:/data/db
-
+      - "8080:8080"
+      - "8081:8081"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
 secrets:
    jwt_private_key:
     file: ./UserService.API/secrets/jwt_private_key.txt

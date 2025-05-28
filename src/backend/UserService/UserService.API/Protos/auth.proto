@@ -1,0 +1,6 @@
+﻿namespace UserService.API.Protos
+{
+    public class Class
+    {
+    }
+}
