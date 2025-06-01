@@ -1,0 +1,16 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "UserClient";
+
+service UserService {
+  rpc GenerateEmailConfirmationToken (GenerateTokenRequest) returns (GenerateTokenResponse);
+  rpc GeneratePasswordResetToken (GenerateTokenRequest) returns (GenerateTokenResponse);
+}
+
+message GenerateTokenRequest {
+  string email = 1;
+}
+
+message GenerateTokenResponse {
+  string token = 1;
+}

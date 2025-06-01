@@ -1,6 +1,7 @@
 include:
   - UserService/docker-compose.yml
   - NotificationService/docker-compose.yml
+ # - AccountService/docker-compose.yml
 
 services:
   mssql:
@@ -9,6 +10,8 @@ services:
     user: root
     ports:
       - "1433:1433"
+    networks:
+      - app-net
     volumes:
       - mssql-data:/var/opt/mssql/data
     environment:
@@ -26,6 +29,8 @@ services:
     container_name: redis
     ports:
       - "6379:6379"
+    networks:
+      - app-net
     volumes:
       - redis-data:/data
     healthcheck:
@@ -39,6 +44,8 @@ services:
     container_name: mongo
     ports:
       - "27017:27017"
+    networks:
+      - app-net
     volumes:
       - mongo-data:/data/db
     healthcheck:
@@ -47,7 +54,124 @@ services:
       timeout: 5s
       retries: 5
 
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    networks:
+      - app-net
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - zookeeper-data:/data
+      - zookeeper-logs:/datalog
+
+  kafka:
+    image: confluentinc/cp-kafka
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    networks:
+      - app-net
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+    depends_on:
+      - zookeeper
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    ports:
+      - "8090:8080"
+    networks:
+      - app-net
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+      DYNAMIC_CONFIG_ENABLED: 'true'
+    depends_on:
+      - kafka
+    volumes:
+      - kafka-ui-config:/etc/kafkaui
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.14.3
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - xpack.security.http.ssl.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - 9200:9200
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - app-net
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.14.3
+    container_name: kibana
+    environment:
+      - LS_JAVA_OPTS=-Xmx256m -Xms256m
+      - NODE_OPTIONS=--openssl-legacy-provider
+    ports:
+      - 5601:5601
+    depends_on:
+      - elasticsearch
+    networks:
+      - app-net
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.14.3
+    container_name: logstash
+    environment:
+      - LOGSTASH_HTTP_HOST=0.0.0.0
+      - LOGSTASH_HTTP_PORT=5788
+      - LS_JAVA_OPTS=-Xmx256m -Xms256m
+    ports:
+      - 5788:5788
+    volumes:
+      - ./logstash-init.conf:/usr/share/logstash/pipeline/logstash.config:ro
+    depends_on:
+      - elasticsearch
+    networks:
+      - app-net
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./certs/aspnet-dev.crt:/etc/nginx/ssl/aspnet-dev.crt:ro
+      - ./certs/aspnet-dev.key:/etc/nginx/ssl/aspnet-dev.key:ro
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - app-net
+
 volumes:
   mssql-data:
   redis-data:
   mongo-data:
+  zookeeper-data:
+  zookeeper-logs:
+  kafka-data:
+  elasticsearch_data:
+  kafka-ui-config:
+
+networks:
+  app-net:
+    driver: bridge

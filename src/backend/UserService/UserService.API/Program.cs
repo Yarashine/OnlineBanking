@@ -1,3 +1,4 @@
+using Serilog;
 using UserService.API.DI;
 using UserService.API.Middlewares;
 using UserService.Application.DI;
@@ -12,6 +13,9 @@ namespace UserService.API
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddControllers();
             builder.Services.AddOpenApi();
+            builder.Configuration
+                .AddJsonFile("appsettings.json")
+                .AddEnvironmentVariables();
 
             builder.Services.AddHttpContextAccessor()
                 .AddRedis(builder.Configuration)
@@ -23,7 +27,12 @@ namespace UserService.API
                 .AddHealthChecks(builder.Configuration)
                 .AddUseCases()
                 .AddServices(builder.Configuration)
-                .AddValidation();
+                .AddValidation()
+                .AddKafka(builder.Configuration)
+                .AddGrpcServices()
+                .ConfigureLogging(builder.Configuration);
+
+            builder.Host.UseSerilog();
 
             var app = builder.Build();
 
@@ -38,6 +47,7 @@ namespace UserService.API
             }
 
             app.AddRoles();
+            app.UseGrpc();
 
             app.UseHttpsRedirection();
             app.UseRouting();

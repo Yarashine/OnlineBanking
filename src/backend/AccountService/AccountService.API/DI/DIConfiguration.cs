@@ -4,6 +4,8 @@ using AccountService.DAL.Configs;
 using AccountService.DAL.Contracts.Repositories;
 using AccountService.DAL.Data;
 using AccountService.DAL.Repositories;
+using AccountService.Domain.Configs;
+using Confluent.Kafka;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
@@ -14,6 +16,19 @@ public static class DIConfiguration
     public static IServiceCollection AddConfigs(this IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<PaginationSettings>(configuration.GetSection(PaginationSettings.SectionName));
+
+        return services;
+    }
+
+    public static IServiceCollection AddKafka(this IServiceCollection services, IConfiguration configuration)
+    {
+
+        services.Configure<KafkaOptions>(configuration.GetSection("Kafka"));
+        services.AddSingleton<IProducer<Null, string>>(sp =>
+        {
+            var config = new ProducerConfig { BootstrapServers = configuration["Kafka:BootstrapServers"] };
+            return new ProducerBuilder<Null, string>(config).Build();
+        });
 
         return services;
     }
@@ -70,6 +85,17 @@ public static class DIConfiguration
 
         return services;
     }
+
+    public static IServiceCollection AddHealthChecks(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddHealthChecks().AddDbContextCheck<AccountDbContext>();
+
+        services.AddHealthChecks()
+            .AddSqlServer(configuration.GetConnectionString("MSSQL")!);
+
+        return services;
+    }
+
     public static IServiceCollection AddConnetionStrings(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddDbContext<AccountDbContext>(options =>

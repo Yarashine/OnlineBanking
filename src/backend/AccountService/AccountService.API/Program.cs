@@ -14,6 +14,10 @@ namespace AccountService.API
             builder.Services.AddControllers();
             builder.Services.AddOpenApi();
 
+            builder.Configuration
+                .AddJsonFile("appsettings.json")
+                .AddEnvironmentVariables();
+
             builder.Services.AddConnetionStrings(builder.Configuration);
 
             builder.Services.AddConfigs(builder.Configuration);

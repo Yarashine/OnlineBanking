@@ -3,19 +3,21 @@ services:
     image: ${DOCKER_REGISTRY-}accountserviceapi
     build:
       context: .
-      dockerfile: AccountService.API/Dockerfile
+      dockerfile: AccountService.API/Dockerfile      
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ASPNETCORE_HTTPS_PORTS=8081    
+    env_file:
+      - .env
+    networks:
+      - app-net
+    container_name: accountservice
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
     ports:
-    - "8080:8080"
-    - "8081:8081"
-
-  mssql:
-   image: mcr.microsoft.com/mssql/server:2022-latest
-   user: root
-   ports:
-    - "1433:1433"
-   volumes:
-    - ./data/mssql:/var/opt/mssql/data
-   environment:
-    - ACCEPT_EULA=Y
-    - SA_PASSWORD=MyStrong@Passw0rd
-    - MSSQL_PID=Developer
+    - "8084:8080"
+    - "8085:8081"

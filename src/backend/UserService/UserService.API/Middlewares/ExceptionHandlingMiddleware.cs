@@ -4,7 +4,9 @@ using UserService.Domain.Exceptions;
 
 namespace UserService.API.Middlewares;
 
-public class ExceptionHandlingMiddleware(RequestDelegate _next, ILogger<ExceptionHandlingMiddleware> _logger)
+public class ExceptionHandlingMiddleware(
+    RequestDelegate _next,
+    ILogger<ExceptionHandlingMiddleware> _logger)
 {
     public async Task Invoke(HttpContext context)
     {

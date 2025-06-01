@@ -18,9 +18,29 @@ using System.Threading.Tasks;
 using FluentValidation.AspNetCore;
 using FluentValidation;
 using System.Reflection;
+using NotificationService.API.Services;
+using UserClient;
+using NotificationService.Infrastructure.Contracts.Services;
+using Hangfire;
+using Hangfire.Redis.StackExchange;
+using Serilog;
+using Serilog.Exceptions;
+using Serilog.Formatting.Json;
+using Confluent.Kafka;
+using Confluent.Kafka.Admin;
 
 public static class DIConfiguration
 {
+    public static IServiceCollection AddEnvVariables(this IServiceCollection services, IConfiguration configuration)
+    {
+        configuration["ConnectionStrings:MSSQL"] = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+        configuration["ConnectionStrings:Redis"] = Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING");
+        configuration["Email:Username"] = Environment.GetEnvironmentVariable("EMAIL_USERNAME");
+        configuration["Email:Password"] = Environment.GetEnvironmentVariable("EMAIL_PASSWORD");
+        configuration["Kafka:BootstrapServers"] = Environment.GetEnvironmentVariable("KAFKA_BOOTSTRAP_SERVERS");
+        configuration["Logstash:Uri"] = Environment.GetEnvironmentVariable("LOGSTASH_URI");
+        return services;
+    }
     public static IServiceCollection AddConfigs(this IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<SmtpSettings>(configuration.GetSection(SmtpSettings.SectionName));
@@ -37,10 +57,74 @@ public static class DIConfiguration
         return services;
     }
 
+    public static IServiceCollection ConfigureLogging(this IServiceCollection services, IConfiguration configuration)
+    {
+        Log.Logger = new LoggerConfiguration()
+            .Enrich.FromLogContext()
+            .Enrich.WithExceptionDetails()
+            .WriteTo.Console()
+            .WriteTo.Http(
+                requestUri: configuration["Logstash:Uri"],
+                queueLimitBytes: null,
+                textFormatter: new JsonFormatter())
+            .CreateLogger();
+        return services;
+    }
+
+    public static IServiceCollection AddHangfire(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddHangfire(config => config
+            .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+            .UseSimpleAssemblyNameTypeSerializer()
+            .UseRecommendedSerializerSettings()
+            .UseRedisStorage(ConnectionMultiplexer.Connect(configuration.GetConnectionString("Redis"))));
+        services.AddHangfireServer();
+        return services;
+    }
+
+    public static IServiceCollection AddHealthChecks(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddHealthChecks().AddDbContextCheck<AppDbContext>();
+
+        services.AddHealthChecks()
+            .AddSqlServer(configuration.GetConnectionString("MSSQL")!);
+
+        services.AddHealthChecks()
+            .AddRedis(configuration.GetConnectionString("Redis")!);
+        return services;
+    }
+
+    public static IServiceCollection AddKafka(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<KafkaOptions>(configuration.GetSection("Kafka"));
+        services.AddHostedService<KafkaConsumerService>();
+        services.AddSingleton<IProducer<Null, string>>(sp =>
+        {
+            var config = new ProducerConfig { BootstrapServers = configuration["Kafka:BootstrapServers"] };
+            return new ProducerBuilder<Null, string>(config).Build();
+        });
+
+        return services;
+    }
+
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
+        services.AddGrpcClient<UserService.UserServiceClient>(o =>
+        {
+            o.Address = new Uri("https://userservice:8081");
+        })
+        .ConfigureChannel(channel =>
+        {
+            channel.HttpHandler = new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+            };
+        });
+        services.AddScoped<IGrpcNotificationService, GrpcNotificationService>();
         services.AddScoped<ISendEmailConfirmationUseCase, SendEmailConfirmationUseCase>();
         services.AddScoped<ISendResetPasswordEmailUseCase, SendResetPasswordEmailUseCase>();
+        services.AddScoped<IVerifyConfirmationUseCase, VerifyConfirmationUseCase>();
+        services.AddScoped<IVerifyResetPasswordUseCase, VerifyResetPasswordUseCase>();
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<INotificationRepository, NotificationRepository>();
@@ -51,6 +135,7 @@ public static class DIConfiguration
         services.AddMapping();
         return services;
     }
+
 
     public static IServiceCollection AddValidation(this IServiceCollection services)
     {

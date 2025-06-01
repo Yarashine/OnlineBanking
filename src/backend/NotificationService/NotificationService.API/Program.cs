@@ -1,6 +1,7 @@
 namespace NotificationService.API;
 
 using NotificationService.API.DI;
+using Serilog;
 
 public class Program
 {
@@ -13,9 +14,25 @@ public class Program
         builder.Services.AddControllers();
         builder.Services.AddOpenApi();
 
+        builder.Configuration
+            .AddJsonFile("appsettings.json")
+            .AddEnvironmentVariables();
+
+        builder.Services.AddEnvVariables(builder.Configuration);
+
         builder.Services.AddConfigs(builder.Configuration);
 
         builder.Services.AddConnectionStrings(builder.Configuration);
+
+        builder.Services.AddHangfire(builder.Configuration);
+
+        builder.Services.ConfigureLogging(builder.Configuration);
+
+        builder.Host.UseSerilog();
+
+        builder.Services.AddKafka(builder.Configuration);
+
+        builder.Services.AddHealthChecks();
 
         builder.Services.AddValidation();
 
@@ -39,6 +56,8 @@ public class Program
         app.MapControllers();
 
         await app.UseMigration();
+
+        app.MapGet("/ping", () => "pong");
 
         app.Run();
     }

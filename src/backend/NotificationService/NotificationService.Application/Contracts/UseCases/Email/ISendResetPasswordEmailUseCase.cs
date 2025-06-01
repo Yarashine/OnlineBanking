@@ -2,5 +2,5 @@
 
 public interface ISendResetPasswordEmailUseCase
 {
-    Task ExecuteAsync(string email, string emailBody, CancellationToken cancellation = default);
+    Task ExecuteAsync(string email, string newPassword, CancellationToken cancellation = default);
 }
