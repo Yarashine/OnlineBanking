@@ -4,10 +4,17 @@ services:
     build:
       context: .
       dockerfile: NotificationService.API/Dockerfile
+    container_name: notificationservice
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
       - ASPNETCORE_HTTPS_PORTS=8081
+      - Kafka__BootstrapServers=kafka:9092
+      - Kafka__Topics__EmailConfirmation=email-confirmation     
+    env_file:
+      - .env
+    networks:
+      - app-net
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
@@ -16,3 +23,4 @@ services:
     ports:
       - "8082:8080"
       - "8083:8081"
+      

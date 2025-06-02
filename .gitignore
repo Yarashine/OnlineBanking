@@ -10,6 +10,8 @@ src/backend/NotificationService/data/
 src/backend/NotificationService/Directory.Build.props
 src/backend/AccountService/data/
 src/backend/AccountService/Directory.Build.props
+certs/
+.env
 
 # User-specific files
 *.rsuser

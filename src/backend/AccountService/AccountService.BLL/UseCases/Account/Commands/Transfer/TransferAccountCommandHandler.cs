@@ -1,14 +1,24 @@
-﻿using AccountService.DAL.Contracts.Repositories;
+﻿using AccountService.BLL.UseCases.Account.Commands.Delete;
+using AccountService.DAL.Contracts.Repositories;
 using AccountService.DAL.Exceptions;
+using AccountService.DAL.Models;
 using AccountService.DAL.Repositories;
+using AccountService.Domain.Configs;
 using AutoMapper;
+using Confluent.Kafka;
 using MediatR;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using System.Text.Json;
 
 namespace AccountService.BLL.UseCases.Account.Commands.Transfer;
 
 public class TransferAccountCommandHandler(
     IUnitOfWork unitOfWork,
-    IMapper autoMapper) : IRequestHandler<TransferAccountCommand>
+    IMapper autoMapper,
+    IOptions<KafkaOptions> options,
+    IProducer<Null, string> kafkaProducer,
+    ILogger<DeleteAccountCommandHandler> logger) : IRequestHandler<TransferAccountCommand>
 {
     public async Task Handle(TransferAccountCommand request, CancellationToken cancellationToken = default)
     {
@@ -43,5 +53,33 @@ public class TransferAccountCommandHandler(
             await unitOfWork.RollbackTransactionAsync(cancellationToken);
             throw;
         }
+
+
+        logger.LogInformation("Before sending transfer notification to notificatiion service kafka account service");
+
+        var messageText = $"You send {request.Amount} from your account with Id {request.SenderAccountId} to {request.ReceiverAccountId}";
+
+        var message = new SendNotificationModel()
+        {
+            UserId = sender.UserId,
+            Message = messageText,
+        };
+        var serialisedMessage = JsonSerializer.Serialize(message);
+
+        await kafkaProducer.ProduceAsync(options.Value.Topics.SendNotification, new Message<Null, string> { Value = serialisedMessage }, cancellationToken);
+
+        messageText = $"You get {request.Amount} to your account with Id {request.ReceiverAccountId} from {request.SenderAccountId}";
+
+        message = new SendNotificationModel()
+        {
+            UserId = sender.UserId,
+            Message = messageText,
+        };
+
+        serialisedMessage = JsonSerializer.Serialize(message);
+
+        await kafkaProducer.ProduceAsync(options.Value.Topics.SendNotification, new Message<Null, string> { Value = serialisedMessage }, cancellationToken);
+
+        logger.LogInformation("After sending transfer notification to notificatiion service kafka account service");
     }
 }

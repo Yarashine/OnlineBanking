@@ -11,9 +11,15 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
       - ASPNETCORE_HTTPS_PORTS=8081
+      - Kafka__BootstrapServers=kafka:9092
+      - Kafka__Topics__EmailConfirmation=email-confirmation    
+    env_file:
+      - .env
     ports:
       - "8080:8080"
-      - "8081:8081"
+      - "8081:8081" 
+    networks:
+      - app-net
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
@@ -22,8 +28,7 @@ services:
 secrets:
    jwt_private_key:
     file: ./UserService.API/secrets/jwt_private_key.txt
-
-
+    
 
 
     

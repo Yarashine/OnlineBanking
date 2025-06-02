@@ -1,6 +1,16 @@
-﻿namespace UserService.API.Protos
-{
-    public class Class
-    {
-    }
+﻿syntax = "proto3";
+
+option csharp_namespace = "UserService";
+
+service UserService {
+  rpc GenerateEmailConfirmationToken (GenerateTokenRequest) returns (GenerateTokenResponse);
+  rpc GeneratePasswordResetToken (GenerateTokenRequest) returns (GenerateTokenResponse);
+}
+
+message GenerateTokenRequest {
+  string email = 1;
+}
+
+message GenerateTokenResponse {
+  string token = 1;
 }

@@ -5,5 +5,5 @@ namespace UserService.Application.Contracts.UseCases.Authorization;
 
 public interface IGenerateTokenForResetPassword
 {
-    Task ExecuteAsync(string userId, CancellationToken cancellation = default);
+    Task<string> ExecuteAsync(string email, CancellationToken cancellation = default);
 }
