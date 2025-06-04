@@ -17,7 +17,6 @@ public class ClientController(
     IGetByIdUseCase getClientById,
     IGetByUserIdUseCase getClientByUserId) : ControllerBase
 {
-    [Authorize]
     [HttpPost]
     public async Task<IActionResult> Create(CreateClientRequest request, CancellationToken cancellation = default)
     {
@@ -27,7 +26,6 @@ public class ClientController(
         return Ok();
     }
 
-    [Authorize]
     [HttpPut]
     public async Task<IActionResult> Update(UpdateClientRequest request, CancellationToken cancellation = default)
     {
@@ -35,7 +33,6 @@ public class ClientController(
         return Ok();
     }
 
-    [Authorize]
     [HttpDelete]
     public async Task<IActionResult> Delete(string id, CancellationToken cancellation = default)
     {
@@ -43,7 +40,6 @@ public class ClientController(
         return Ok();
     }
 
-    [Authorize]
     [HttpGet]
     public async Task<IActionResult> GetById(string id, CancellationToken cancellation = default)
     {
@@ -51,7 +47,6 @@ public class ClientController(
         return Ok(client);
     }
 
-    [Authorize]
     [HttpGet("user-id")]
     public async Task<ActionResult<ClientResponse>> GetByUserId(int id, CancellationToken cancellation = default)
     {

@@ -1,0 +1,11 @@
+<div class="email-confirmation-page">
+  <h2>Email Confirmation</h2>
+  <p>A confirmation email has been sent to <strong>{{ email }}</strong>.</p>
+  <p>Please check your inbox (and spam/junk folder) to confirm your email address.</p>
+  <p>
+    Didn't receive the email? 
+    <a (click)="resendEmail()" class="resend-link" [class.disabled]="isResending">
+      {{ isResending ? 'Sending...' : 'Resend Email' }}
+    </a>
+  </p>
+</div>

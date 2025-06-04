@@ -25,7 +25,6 @@ public class GenerateTokenForResetPassword(
 
         var token = await userManager.GeneratePasswordResetTokenAsync(user);
 
-        // НЕ логируем token — это секретные данные.
         logger.LogInformation("Password reset token generated successfully for user: {Email}", email);
 
         return token;

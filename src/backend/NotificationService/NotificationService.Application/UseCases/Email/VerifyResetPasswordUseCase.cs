@@ -24,7 +24,9 @@ public class VerifyResetPasswordUseCase(
         logger.LogInformation("Reset token verified for email: {Email}", resetData.Email);
         logger.LogInformation("Publishing reset password message to Kafka topic: {Topic}", options.Topics.ResetPass);
 
-        var resetMessage = new ResetMessage(resetData.Email, resetData.NewPassword, token);
+        var realToken = token.Replace("_", "+");
+
+        var resetMessage = new ResetMessage(resetData.Email, resetData.NewPassword, realToken);
         var serialisedMessage = JsonSerializer.Serialize(resetMessage);
 
         await kafkaProducer.ProduceAsync(options.Topics.ResetPass, new Message<Null, string> { Value = serialisedMessage }, cancellation);

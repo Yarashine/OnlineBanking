@@ -1,6 +1,7 @@
 namespace NotificationService.API;
 
 using NotificationService.API.DI;
+using NotificationService.Application.Hubs;
 using Serilog;
 
 public class Program
@@ -14,9 +15,21 @@ public class Program
         builder.Services.AddControllers();
         builder.Services.AddOpenApi();
 
+        builder.Services.AddSignalR();
+
         builder.Configuration
             .AddJsonFile("appsettings.json")
             .AddEnvironmentVariables();
+
+        builder.Services.AddCors(options =>
+        {
+            options.AddDefaultPolicy(builder =>
+            {
+                builder.AllowAnyOrigin()
+                       .AllowAnyMethod()
+                       .AllowAnyHeader();
+            });
+        });
 
         builder.Services.AddEnvVariables(builder.Configuration);
 
@@ -48,6 +61,11 @@ public class Program
         }
 
         app.UseHttpsRedirection();
+
+        app.UseCors();
+
+        app.MapHub<NotificationHub>("/notificationHub");
+
 
         app.UseAuthorization();
 

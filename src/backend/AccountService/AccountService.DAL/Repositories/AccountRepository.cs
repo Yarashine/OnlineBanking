@@ -26,4 +26,12 @@ public class AccountRepository(IDbContext dbContext) : BaseRepository<Account>(d
             .AsNoTracking()
             .ToListAsync(cancellationToken);
     }
+
+    public async Task<IEnumerable<Account>> GetAllAsync(int pageNumber, int pageSize, CancellationToken cancellationToken)
+    {
+        return await accounts
+            .Paginate(pageNumber, pageSize)
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+    }
 }

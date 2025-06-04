@@ -24,7 +24,9 @@ public class VerifyConfirmationUseCase(
         logger.LogInformation("Email confirmation token verified for email: {Email}", email);
         logger.LogInformation("Publishing confirmation message to Kafka topic: {Topic}", options.Topics.ConfirmEmail);
 
-        var confrimMessage = new ConfirmMessage(email, token);
+        var realToken = token.Replace("_", "+");
+
+        var confrimMessage = new ConfirmMessage(email, realToken);
         var serialisedMessage = JsonSerializer.Serialize(confrimMessage);
 
         await kafkaProducer.ProduceAsync(options.Topics.ConfirmEmail, new Message<Null, string> { Value = serialisedMessage }, cancellation);

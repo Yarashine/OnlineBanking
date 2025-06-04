@@ -1,0 +1,45 @@
+<div class="auth-container">
+  <h2>Login</h2>
+
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="login">Email</label>
+      <input
+        type="text"
+        id="login"
+        formControlName="login"
+        placeholder="Enter your login"
+      />
+      <div class="error" *ngIf="login.invalid && login.touched">
+        <small *ngIf="login.errors?.['required']">Login is required.</small>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input
+        type="password"
+        id="password"
+        formControlName="password"
+        placeholder="Enter your password"
+      />
+      <div class="error" *ngIf="password.invalid && password.touched">
+        <small *ngIf="password.errors?.['required']">Password is required.</small>
+        <small *ngIf="password.errors?.['minlength']">Password must be at least 6 characters.</small>
+      </div>
+    </div>
+
+    <button type="submit" [disabled]="loginForm.invalid || loading">
+      <span *ngIf="!loading">Log in</span>
+      <span *ngIf="loading">Loading...</span>
+    </button>
+  </form>
+
+  <p class="link">  
+  <a routerLink="/signup">Don’t have an account?</a>
+</p>
+<p class="link">
+  <a routerLink="/forgot-password">Forgot your password?</a>
+</p>
+
+</div>

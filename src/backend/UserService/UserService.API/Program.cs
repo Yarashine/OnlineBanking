@@ -17,6 +17,29 @@ namespace UserService.API
                 .AddJsonFile("appsettings.json")
                 .AddEnvironmentVariables();
 
+            builder.Configuration["ConnectionStrings:MSSQL"] = Environment.GetEnvironmentVariable("MSSQL_CONNECTION")
+               ?? throw new ArgumentException("MSSQL_CONNECTION environment variable is not set.");
+            builder.Configuration["ConnectionStrings:Redis"] = Environment.GetEnvironmentVariable("REDIS_CONNECTION")
+                ?? throw new ArgumentException("REDIS_CONNECTION environment variable is not set.");
+            builder.Configuration["MongoSettings:ConnectionString"] = Environment.GetEnvironmentVariable("MONGO_CONNECTION")
+                ?? throw new ArgumentException("MONGO_CONNECTION environment variable is not set.");
+            builder.Configuration["Jwt:PrivateKeyPath"] = Environment.GetEnvironmentVariable("JWT_PRIVATE_KEY_PATH")
+                ?? throw new ArgumentException("JWT_PRIVATE_KEY_PATH environment variable is not set.");
+            builder.Configuration["Jwt:PublicKey"] = Environment.GetEnvironmentVariable("JWT_PUBLIC_KEY")
+                ?? throw new ArgumentException("KAFKA_BOOTSTRAP environment variable is not set.");
+            builder.Configuration["Logstash:Uri"] = Environment.GetEnvironmentVariable("LOGSTASH_URI")
+                ?? throw new ArgumentException("LOGSTASH_URI environment variable is not set.");
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(builder =>
+                {
+                    builder.AllowAnyOrigin()
+                           .AllowAnyMethod()
+                           .AllowAnyHeader();
+                });
+            });
+
             builder.Services.AddHttpContextAccessor()
                 .AddRedis(builder.Configuration)
                 .AddMongo(builder.Configuration)
@@ -48,6 +71,8 @@ namespace UserService.API
 
             app.AddRoles();
             app.UseGrpc();
+
+            app.UseCors();
 
             app.UseHttpsRedirection();
             app.UseRouting();

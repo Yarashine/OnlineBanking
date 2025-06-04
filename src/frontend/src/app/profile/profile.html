@@ -1,0 +1,95 @@
+<div class="profile-page, auth-container" *ngIf="isAuthenticated; else notAuthenticated">
+  <h2>Your Profile</h2>
+  <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+    <div class="form-group" style="display: none;">
+      <label for="id">Client ID</label>
+      <input id="id" formControlName="id" readonly />
+    </div>
+    <div class="form-group">
+      <label for="firstName">First Name</label>
+      <input
+        id="firstName"
+        formControlName="firstName"
+        [class.invalid]="firstName.invalid && (firstName.dirty || firstName.touched)"
+      />
+      <div *ngIf="firstName.invalid && (firstName.dirty || firstName.touched)" class="error">
+        <div *ngIf="firstName.errors?.['minlength'] || firstName.errors?.['maxlength']">
+          First name must be between 2 and 50 characters.
+        </div>
+        <div *ngIf="firstName.errors?.['pattern']">
+          First name can only contain letters, spaces, or hyphens.
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="lastName">Last Name</label>
+      <input
+        id="lastName"
+        formControlName="lastName"
+        [class.invalid]="lastName.invalid && (lastName.dirty || lastName.touched)"
+      />
+      <div *ngIf="lastName.invalid && (lastName.dirty || lastName.touched)" class="error">
+        <div *ngIf="lastName.errors?.['minlength'] || lastName.errors?.['maxlength']">
+          Last name must be between 2 and 50 characters.
+        </div>
+        <div *ngIf="lastName.errors?.['pattern']">
+          Last name can only contain letters, spaces, or hyphens.
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="patronymic">Patronymic</label>
+      <input
+        id="patronymic"
+        formControlName="patronymic"
+        [class.invalid]="patronymic.invalid && (patronymic.dirty || patronymic.touched)"
+      />
+      <div *ngIf="patronymic.invalid && (patronymic.dirty || patronymic.touched)" class="error">
+        <div *ngIf="patronymic.errors?.['minlength'] || patronymic.errors?.['maxlength']">
+          Patronymic must be between 2 and 50 characters.
+        </div>
+        <div *ngIf="patronymic.errors?.['pattern']">
+          Patronymic can only contain letters, spaces, or hyphens.
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="phoneNumber">Phone Number</label>
+      <input
+        id="phoneNumber"
+        formControlName="phoneNumber"
+        [class.invalid]="phoneNumber.invalid && (phoneNumber.dirty || phoneNumber.touched)"
+      />
+      <div *ngIf="phoneNumber.invalid && (phoneNumber.dirty || phoneNumber.touched)" class="error">
+        <div *ngIf="phoneNumber.errors?.['pattern']">
+          Phone number must be in international format (e.g., +1234567890).
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="passportIdentifier">Passport Identifier</label>
+      <input
+        id="passportIdentifier"
+        formControlName="passportIdentifier"
+        [class.invalid]="passportIdentifier.invalid && (passportIdentifier.dirty || passportIdentifier.touched)"
+      />
+      <div *ngIf="passportIdentifier.invalid && (passportIdentifier.dirty || passportIdentifier.touched)" class="error">
+        <div *ngIf="passportIdentifier.errors?.['minlength'] || passportIdentifier.errors?.['maxlength']">
+          Passport identifier must be exactly 10 characters.
+        </div>
+        <div *ngIf="passportIdentifier.errors?.['pattern']">
+          Passport identifier can only contain letters and numbers.
+        </div>
+      </div>
+    </div>
+    <button type="submit" class="btn" [disabled]="profileForm.invalid || isSubmitting">
+      {{ isSubmitting ? 'Saving...' : 'Save Changes' }}
+    </button>
+  </form>
+</div>
+
+<ng-template #notAuthenticated>
+  <div class="not-authenticated">
+    <p>Please <a routerLink="/login">log in</a> or <a routerLink="/signup">sign up</a> to view your profile.</p>
+  </div>
+</ng-template>

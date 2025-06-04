@@ -1,0 +1,18 @@
+<form [formGroup]="form" (ngSubmit)="submit()" class="card">
+  <label>First Name</label>
+  <input formControlName="firstName" />
+
+  <label>Last Name</label>
+  <input formControlName="lastName" />
+
+  <label>Patronymic</label>
+  <input formControlName="patronymic" />
+
+  <label>Phone Number</label>
+  <input formControlName="phoneNumber" />
+
+  <label>Passport ID</label>
+  <input formControlName="passportIdentifier" />
+
+  <button class="btn" type="submit">Save</button>
+</form>

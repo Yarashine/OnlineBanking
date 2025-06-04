@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using UserService.Application.Contracts.Services;
 using UserService.Application.Contracts.UseCases.Authorization;
+using UserService.Application.Contracts.UseCases.Clients;
 using UserService.Application.DTOs.Requests;
 using UserService.Application.DTOs.Responses;
 using UserService.Domain.Configs;
@@ -25,7 +26,8 @@ public class SignUpUseCase(
     ITokenService tokenService,
     IOptions<KafkaOptions> options,
     IProducer<Null, string> kafkaProducer,
-    ILogger<SignUpUseCase> logger) : ISignUpUseCase
+    ILogger<SignUpUseCase> logger,
+    ICreateUseCase createUseCase) : ISignUpUseCase
 {
     private readonly KafkaOptions kafkaEmailConfirmation = options.Value;
 
@@ -34,6 +36,7 @@ public class SignUpUseCase(
         logger.LogInformation("Starting user registration for email: {Email}", request.Email);
 
         var user = autoMapper.Map<User>(request);
+        user.UserName = request.Email;
         var result = await userManager.CreateAsync(user, request.Password);
         if (result.Errors.Any())
         {
@@ -55,6 +58,10 @@ public class SignUpUseCase(
         logger.LogInformation("User created successfully: {Email}", request.Email);
 
         await userManager.AddToRoleAsync(user, Role.Client.ToString());
+
+        var createClient = new CreateClientRequest();
+
+        await createUseCase.ExecuteAsync(createClient, user.Id);
 
         var confirmMessage = JsonSerializer.Serialize(new
         {
