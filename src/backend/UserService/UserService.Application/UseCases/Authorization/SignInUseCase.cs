@@ -21,19 +21,19 @@ public class SignInUseCase(
     {
         logger.LogInformation("Sign-in attempt for login: {Login}", request.Login);
 
-        var user = await userManager.FindByNameAsync(request.Login);
+        var user = await userManager.FindByEmailAsync(request.Login);
         if (user == null)
         {
             logger.LogWarning("Sign-in failed. User not found: {Login}", request.Login);
             throw new BadRequestException("Invalid credentials");
         }
 
-        var isConfirmedEmail = await userManager.IsEmailConfirmedAsync(user);
-        if (!isConfirmedEmail)
-        {
-            logger.LogWarning("Sign-in failed. Email not confirmed for user: {Login}", request.Login);
-            throw new BadRequestException("Email should be confirmed");
-        }
+        //var isConfirmedEmail = await userManager.IsEmailConfirmedAsync(user);
+        //if (!isConfirmedEmail)
+        //{
+        //    logger.LogWarning("Sign-in failed. Email not confirmed for user: {Login}", request.Login);
+        //    throw new BadRequestException("Email should be confirmed");
+        //}
 
         var isPasswordCorrect = await userManager.CheckPasswordAsync(user, request.Password);
         if (!isPasswordCorrect)

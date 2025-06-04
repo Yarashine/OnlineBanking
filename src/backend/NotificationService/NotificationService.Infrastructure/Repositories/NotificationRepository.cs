@@ -45,6 +45,12 @@ public class NotificationRepository(AppDbContext context) : INotificationReposit
         return nots;
     }
 
+    public async Task<int> GetAllCountAsync(int userId, CancellationToken cancellation)
+    {
+        return await this.notifications
+            .CountAsync(n => n.UserId == userId, cancellation);
+    }
+
     public async Task<int> GetUnreadCountAsync(int userId, CancellationToken cancellation)
     {
         return await this.notifications

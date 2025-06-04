@@ -31,6 +31,8 @@ public class GetAllTransfersByIdQueryHandler(
             pageNumber = 1;
         }
 
+        pageSize = 1000;
+
         var accountForCheck = await unitOfWork.AccountRepository.GetByIdAsync(request.Id, cancellationToken) 
             ?? throw new NotFoundException("Account");
 

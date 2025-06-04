@@ -35,7 +35,7 @@ public class EmailController(
     }
 
     [HttpPost("forgot-password")]
-    public async Task<IActionResult> ForgotPassword([EmailAddress] string email, string newPassword, int userId, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> ForgotPassword([EmailAddress] string email, string newPassword, CancellationToken cancellationToken = default)
     {
         logger.LogInformation("Send reset password in email controller");
         await sendResetPasswordEmailUseCase.ExecuteAsync(email, newPassword, cancellationToken);

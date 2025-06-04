@@ -25,7 +25,6 @@ public class GenerateTokenForEmailConfirmationUseCase(
 
         var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
 
-        // НЕ ЛОГИРУЕМ token, т.к. это чувствительная информация.
         logger.LogInformation("Email confirmation token generated successfully for user: {Email}", email);
 
         return token;

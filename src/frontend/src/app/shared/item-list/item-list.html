@@ -1,0 +1,5 @@
+<div class="card" *ngFor="let item of items">
+  <div>{{ item[displayField] }}</div>
+  <button class="btn" (click)="viewDetails.emit(item)">Details</button>
+  <button class="btn secondary" (click)="deleteItem.emit(item.id)">Delete</button>
+</div>

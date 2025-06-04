@@ -1,0 +1,19 @@
+<header class="header">
+  <div class="left">
+    <a style="cursor: pointer; text-decoration: none;" routerLink="/">🏠 Home</a>
+  </div>
+  <div class="right">
+    <ng-container *ngIf="isLoggedIn; else notLoggedIn">
+      <a routerLink="/profile" style="text-decoration: none;">👤 Profile</a>
+      <div class="notification" (click)="goToNotifications()">
+        🔔
+        <span class="badge" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+      </div>
+      <a (click)="logout()" style="cursor: pointer; text-decoration: none;">🚪 Logout</a>
+    </ng-container>
+    <ng-template #notLoggedIn>
+      <a routerLink="/signup" style="text-decoration: none;">📝 Sign Up</a>
+      <a routerLink="/login" style="text-decoration: none;">🔑 Sign In</a>
+    </ng-template>
+  </div>
+</header>

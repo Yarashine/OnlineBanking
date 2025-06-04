@@ -1,0 +1,38 @@
+:host {
+  display: block;
+  font-family: Arial, sans-serif;
+  background-color: #f1f8f5;
+  color: #1b5e20;
+}
+
+.card {
+  background: white;
+  border: 1px solid #2e7d32;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.btn {
+  background-color: #2e7d32;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  margin-right: 0.5rem;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background-color: #1b5e20;
+}
+
+.btn.secondary {
+  background-color: white;
+  color: #2e7d32;
+  border: 1px solid #2e7d32;
+}
+
+.btn.secondary:hover {
+  background-color: #c8e6c9;
+}

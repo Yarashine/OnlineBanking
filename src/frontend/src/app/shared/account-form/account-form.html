@@ -1,0 +1,12 @@
+<form [formGroup]="form" (ngSubmit)="submit()" class="card">
+  <label>Name</label>
+  <input formControlName="name" />
+
+  <label>Balance</label>
+  <input formControlName="balance" type="number" />
+
+  <label>Currency</label>
+  <input formControlName="currency" />
+
+  <button class="btn" type="submit">Save</button>
+</form>

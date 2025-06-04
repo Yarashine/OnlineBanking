@@ -8,4 +8,5 @@ public interface INotificationRepository
     Task<List<Notification>> GetAllAsync(int userId, int pageNumber, int pageSize, CancellationToken cancellation = default);
     Task<List<Notification>> GetUnreadAsync(int userId, int pageNumber, int pageSize, CancellationToken cancellation = default);
     Task<int> GetUnreadCountAsync(int userId, CancellationToken cancellation = default);
+    Task<int> GetAllCountAsync(int userId, CancellationToken cancellation = default);
 }

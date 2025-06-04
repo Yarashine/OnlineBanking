@@ -20,7 +20,9 @@ public class CreateAccountCommandHandler(
 {
     public async Task Handle(CreateAccountCommand request, CancellationToken cancellationToken = default)
     {
+        Console.WriteLine("create command");
         var account = autoMapper.Map<DAL.Entities.Account>(request);
+        account.Balance = 10;
         await unitOfWork.AccountRepository.CreateAsync(account, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 

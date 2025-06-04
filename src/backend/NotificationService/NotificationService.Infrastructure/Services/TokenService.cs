@@ -67,9 +67,11 @@ public class TokenService(
 
         var serializedData = JsonSerializer.Serialize(resetData);
 
-        await db.StringSetAsync($"reset:{resetToken}", serializedData, TimeSpan.FromMinutes(10));
+        var safeToken = resetToken.Replace("+", "_");
 
-        return resetToken;
+        await db.StringSetAsync($"reset:{safeToken}", serializedData, TimeSpan.FromMinutes(10));
+
+        return safeToken;
     }
 
     public async Task<ResetData> VerifyResetTokenAsync(string token, CancellationToken cancellation)

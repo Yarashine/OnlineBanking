@@ -1,0 +1,28 @@
+.transaction-history-page {
+  padding: 2rem;
+  background-color: #f1f8f5;
+  width: 100%;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.transaction-history-page h2 {
+  color: #2e7d32;
+  margin-bottom: 1rem;
+}
+
+.transaction-list {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.transaction {
+  border: 1px solid #2e7d32;
+  background-color: white;
+  padding: 1rem;
+  border-radius: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}

@@ -132,6 +132,7 @@ public static class DIConfiguration
         services.AddScoped<IGetUnreadCountUseCase, GetUnreadCountUseCase>();
         services.AddScoped<IGetAllUseCase, GetAllUseCase>();
         services.AddScoped<IGetUnreadUseCase, GetUnreadUseCase>();
+        services.AddScoped<IGetAllCountUseCase, GetAllCountUseCase>();
         services.AddMapping();
         return services;
     }

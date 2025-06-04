@@ -1,0 +1,16 @@
+<div class="transaction-history-page">
+  <h2>Transaction History</h2>
+  <p>Account ID: {{ accountId }}</p>
+  <div class="transaction-list" *ngIf="transactions.length; else noTransactions">
+    <div *ngFor="let transaction of transactions" class="transaction">
+      <p>Transfer ID: {{ transaction.id }}</p>
+      <p>Sender: {{ transaction.senderAccountId }}</p>
+      <p>Receiver: {{ transaction.receiverAccountId }}</p>
+      <p>Amount: ${{ transaction.amount | number: '1.2-2' }}</p>
+      <p>Created: {{ transaction.createdAt | date: 'medium' }}</p>
+    </div>
+  </div>
+  <ng-template #noTransactions>
+    <p>No transactions found for this account.</p>
+  </ng-template>
+</div>

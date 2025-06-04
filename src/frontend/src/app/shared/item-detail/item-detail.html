@@ -1,0 +1,9 @@
+<div class="card" *ngIf="item">
+  <div *ngFor="let key of Object.keys(item)">
+    <strong>{{ key }}:</strong> {{ item[key] }}
+  </div>
+  <div style="margin-top: 1rem;">
+    <button class="btn" (click)="edit.emit()">Edit</button>
+    <button class="btn secondary" (click)="delete.emit()">Delete</button>
+  </div>
+</div>

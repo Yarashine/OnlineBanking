@@ -1,0 +1,11 @@
+<div class="card" *ngFor="let account of pagedAccounts">
+  <div>{{ account.name }}</div>
+  <button class="btn" (click)="view.emit(account)">Details</button>
+  <button class="btn secondary" (click)="delete.emit(account.id)">Delete</button>
+</div>
+
+<div class="pagination">
+  <button *ngFor="let page of [].constructor(totalPages); let i = index" (click)="changePage(i + 1)" [class.active]="currentPage === i + 1">
+    {{ i + 1 }}
+  </button>
+</div>

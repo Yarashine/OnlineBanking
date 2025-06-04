@@ -1,0 +1,28 @@
+<div class="dashboard-page" *ngIf="isAuthenticated; else notAuthenticated">
+  <h2>Your Accounts</h2>
+  <button class="btn" (click)="createAccount()" [disabled]="isCreating">
+    {{ isCreating ? 'Creating...' : 'Create New Account' }}
+  </button>
+
+  <div class="account-list" *ngIf="accounts.length; else noAccounts">
+    <div *ngFor="let account of accounts" class="account">
+      <h4>Account ID: {{ account.id }}</h4>
+      <p>Balance: ${{ account.balance | number: '1.2-2' }}</p>
+      <p>Created: {{ account.createdAt | date: 'mediumDate' }}</p>
+      <button class="btn" [routerLink]="['/transactions', account.id]">
+        View Transaction History
+      </button>
+      <button class="btn" routerLink="/transfer">Create Transfer</button>
+    </div>
+  </div>
+
+  <ng-template #noAccounts>
+    <p>No accounts found. Create one to get started!</p>
+  </ng-template>
+</div>
+
+<ng-template #notAuthenticated>
+  <div class="not-authenticated">
+    <p>Please <a routerLink="/login">log in</a> or <a routerLink="/signup">sign up</a> to view your accounts.</p>
+  </div>
+</ng-template>

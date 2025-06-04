@@ -11,7 +11,8 @@ public class NotificationController(
         ICreateUseCase createNotificationUseCase,
         IGetAllUseCase getAllNotificationsUseCase,
         IGetUnreadUseCase getUnreadNotificationsUseCase,
-        IGetUnreadCountUseCase getUnreadNotificationCountUseCase) : ControllerBase
+        IGetUnreadCountUseCase getUnreadNotificationCountUseCase,
+        IGetAllCountUseCase getAllCountUseCase) : ControllerBase
 {
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateNotificationRequest dto, CancellationToken cancellation = default)
@@ -27,6 +28,13 @@ public class NotificationController(
         return result;
     }
 
+    [HttpGet("all/count/{userId}")]
+    public async Task<ActionResult<int>> GetAllCount(int userId, CancellationToken cancellation = default)
+    {
+        var result = await getUnreadNotificationCountUseCase.ExecuteAsync(userId, cancellation);
+        return Ok(result);
+    }
+
     [HttpGet("/unread/{userId}")]
     public async Task<List<NotificationResponse>> GetUnread(int userId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = -1, CancellationToken cancellation = default)
     {
@@ -37,7 +45,7 @@ public class NotificationController(
     [HttpGet("unread/count/{userId}")]
     public async Task<ActionResult<int>> GetUnreadCount(int userId, CancellationToken cancellation = default)
     {
-        var result = await getUnreadNotificationCountUseCase.ExecuteAsync(userId, cancellation);
+        var result = await getAllCountUseCase.ExecuteAsync(userId, cancellation);
         return Ok(result);
     }
 }

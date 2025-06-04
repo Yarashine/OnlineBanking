@@ -8,9 +8,6 @@ public class UpdateClientRequestValidator : AbstractValidator<UpdateClientReques
 {
     public UpdateClientRequestValidator()
     {
-        RuleFor(x => x.Id)
-            .NotEmpty().WithMessage("Client ID is required.")
-            .Must(id => Guid.TryParse(id, out _)).WithMessage("Client ID must be a valid GUID.");
 
         RuleFor(x => x.FirstName)
             .Length(ClientValidator.MIN_PATRONYMIC_LENGHT, ClientValidator.MAX_PATRONYMIC_LENGHT)

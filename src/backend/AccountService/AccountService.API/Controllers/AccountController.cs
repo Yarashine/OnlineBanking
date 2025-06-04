@@ -16,6 +16,7 @@ public class AccountController(IMediator mediator) : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateAccount(int userId, CancellationToken cancellationToken = default)
     {
+        Console.WriteLine("create controller");
         var command = new CreateAccountCommand { UserId = userId };
         await mediator.Send(command, cancellationToken);
 
@@ -35,6 +36,16 @@ public class AccountController(IMediator mediator) : ControllerBase
     public async Task<ActionResult<IEnumerable<AccountResponse>>> GetAllAccountsByUserId(int userId, CancellationToken cancellationToken = default)
     {
         var query = new GetAllAccountsByUserIdQuery(userId);
+        var accounts = await mediator.Send(query, cancellationToken);
+
+        return Ok(accounts);
+    }
+
+
+    [HttpGet("all")]
+    public async Task<ActionResult<IEnumerable<AccountResponse>>> GetAllAccounts(CancellationToken cancellationToken = default)
+    {
+        var query = new GetAllAccountsQuery();
         var accounts = await mediator.Send(query, cancellationToken);
 
         return Ok(accounts);

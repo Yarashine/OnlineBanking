@@ -30,6 +30,8 @@ public class GetAllAccountsByUserIdQueryHandler(
             pageNumber = 1;
         }
 
+        pageSize = 1000;
+
         var accounts = await unitOfWork.AccountRepository.GetAllByUserIdAsync(request.UserId, pageNumber, pageSize, cancellationToken);
 
         return autoMapper.Map<IEnumerable<AccountResponse>>(accounts);

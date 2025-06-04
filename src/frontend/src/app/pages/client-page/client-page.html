@@ -1,0 +1,19 @@
+<app-item-list
+  [items]="clients"
+  displayField="firstName"
+  (viewDetails)="selectClient($event)"
+  (deleteItem)="deleteClient($event)"
+></app-item-list>
+
+<app-item-detail
+  *ngIf="selectedClient && !isEditing"
+  [item]="selectedClient"
+  (edit)="startEdit()"
+  (delete)="deleteClient(selectedClient.id)"
+></app-item-detail>
+
+<app-item-form
+  *ngIf="isEditing"
+  [item]="selectedClient"
+  (save)="updateClient($event)"
+></app-item-form>

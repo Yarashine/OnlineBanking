@@ -1,0 +1,39 @@
+.email-confirmation-page {
+  padding: 2rem;
+  background-color: #f1f8f5;
+  width: 100%;
+  min-height: 100vh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.email-confirmation-page h2 {
+  color: #2e7d32;
+  margin-bottom: 1rem;
+}
+
+.email-confirmation-page p {
+  margin: 0.5rem 0;
+  color: #333;
+}
+
+.email-confirmation-page .resend-link {
+  color: #2e7d32;
+  text-decoration: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.email-confirmation-page .resend-link:hover {
+  color: #1b5e20;
+  text-decoration: underline;
+}
+
+.email-confirmation-page .resend-link.disabled {
+  color: #999;
+  cursor: not-allowed;
+}

@@ -18,11 +18,30 @@ namespace AccountService.API
                 .AddJsonFile("appsettings.json")
                 .AddEnvironmentVariables();
 
+            builder.Configuration["ConnectionStrings:MSSQL"] = Environment.GetEnvironmentVariable("MSSQL_CONNECTION")
+               ?? throw new ArgumentException("MSSQL_CONNECTION environment variable is not set.");
+            builder.Configuration["Kafka:BootstrapServers"] = Environment.GetEnvironmentVariable("KAFKA_BOOTSTRAP")
+                ?? throw new ArgumentException("KAFKA_BOOTSTRAP environment variable is not set.");
+            builder.Configuration["Logstash:Uri"] = Environment.GetEnvironmentVariable("LOGSTASH_URI")
+                ?? throw new ArgumentException("LOGSTASH_URI environment variable is not set.");
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(builder =>
+                {
+                    builder.AllowAnyOrigin()
+                           .AllowAnyMethod()
+                           .AllowAnyHeader();
+                });
+            });
+
             builder.Services.AddConnetionStrings(builder.Configuration);
 
             builder.Services.AddConfigs(builder.Configuration);
 
             builder.Services.AddSwagger();
+
+            builder.Services.AddKafka(builder.Configuration);
 
             builder.Services.AddServices();
 
@@ -37,8 +56,9 @@ namespace AccountService.API
 
             app.UseHttpsRedirection();
 
-            app.UseAuthorization();
+            app.UseCors();
 
+            app.UseAuthorization();
 
             app.MapControllers();
 
